@@ -17,7 +17,6 @@ Not yet compatible with older browsers.
 
 STILL UNDER DEVELOPMENT - don't expect this to work yet.
 
-[Test Page](http://htmlpreview.github.com/?https://raw.github.com/fchasen/fileStorage/master/index.html)
 
 Getting Started
 -------------------------
