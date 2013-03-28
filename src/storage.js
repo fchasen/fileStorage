@@ -22,15 +22,15 @@ fileStorage.storage.prototype.storageMethod = function(storageType) {
 	}
 
 	//-- Create a new store of that type
-	this._store = new FP.store[_storageType];
+	this._store = new fileStorage.store[this._storageType];
 
 	//-- Handle load errors
-	this._store.failed = _error;
+	this._store.failed = this._error;
 
 }
 
 fileStorage.storage.prototype.determineStorageMethod = function(override) {
-	var methods = ["filesystem", "indexeddb", "websqldatabase", "ram"],
+	var methods = ["filesystem", "indexeddb", "websql", "ram"],
 		method = 'none';
 
 	this.checkSupport();
@@ -45,8 +45,8 @@ fileStorage.storage.prototype.determineStorageMethod = function(override) {
 			}
 		}
 	}	
-
-	fileStorage.storageMethod(method);
+	
+	this.storageMethod(method);
 }
 
 fileStorage.storage.prototype.get = function(path, callback) {
@@ -54,15 +54,15 @@ fileStorage.storage.prototype.get = function(path, callback) {
 }
 
 fileStorage.storage.prototype.batch = function(group, callback) {
-	return this.batch(group, callback);
+	return this._store.batch(group, callback);
 }
 
 fileStorage.storage.prototype.getURL = function(path) {
-	return this.getURL(path);
+	return this._store.getURL(path);
 }
 
 fileStorage.storage.prototype.save = function(path, file, callback) {
-	return this.save(path, file, callback);
+	return this._store.save(path, file, callback);
 }
 
 fileStorage.storage.prototype._error = function(err) {
@@ -74,7 +74,7 @@ fileStorage.storage.prototype.getStorageType = function(){
 }
 
 fileStorage.storage.prototype.checkSupport = function() {
-	var support = "filesystem indexeddb websqldatabase ram".split(' '),
+	var support = "filesystem indexeddb websql ram".split(' '),
 		toTest = "RequestFileSystem IndexedDB openDatabase URL".split(' ');
 
 	for ( var t = -1, len = support.length; ++t < len; ){
@@ -82,7 +82,7 @@ fileStorage.storage.prototype.checkSupport = function() {
 		var test = support[t],
 			method = toTest[t];
 
-		_supported[test] = testSupport(method);
+		this._supported[test] = this.testSupport(method);
 
 	}
 

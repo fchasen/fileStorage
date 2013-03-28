@@ -1,11 +1,12 @@
 fileStorage.store = fileStorage.store || {};
 
-fileStorage.store.indexedDB = function() {
+fileStorage.store.indexeddb = function() {
 	var _store = {},
 		_blobs = {},
 		_queue = new fileStorage.Queue(loader, 6),
 		_indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB,
-		_db;
+		_db,
+		_URL = window.URL;
 
 	const DBNAME = "fileStoragejs_db";
 
@@ -78,7 +79,6 @@ fileStorage.store.indexedDB = function() {
 
 	//-- Fetches url
 	function get(path, callback) {
-
 		if(typeof(_blobs[path]) != "undefined"){
 			callback(_blobs[path]);
 			return; 
@@ -157,7 +157,7 @@ fileStorage.store.indexedDB = function() {
 
 			request.onsuccess = function(event) {
 			  //-- Do nothing for now
-			  console.log("saved", path);
+			  // console.log("saved", path);
 			};
 		});
 	}
@@ -172,7 +172,7 @@ fileStorage.store.indexedDB = function() {
 			return; 
 		}
 
-		url = this._URL.createObjectURL(file);
+		url = _URL.createObjectURL(file);
 
 		//-- need to revokeObjectURL previous urls, but only when cleaning cache
 		// this.createdURLs.forEach(function(url){

@@ -7,22 +7,64 @@
         <meta name="description" content="">
 
 
-        <link rel="stylesheet" href="css/main.css">
-
-        <script src="dist/libs/jquery-1.9.0.min.js"></script>
-        <script src="dist/libs/modernizr-2.6.2.min.js"></script>
-        <script>
-            "use strict";
-            
-            document.onreadystatechange = function () {  
-              if (document.readyState == "complete") {
-              }  
-            };
+        <!-- <link rel="stylesheet" href="css/main.css"> -->
         
-          </script>
-                
-        <!-- FileStorage -->
+        <!-- FileStorage min -->
         <script src="dist/fileStorage.min.js"></script>
+        
+        
+        <script>
+          "use strict";
+          
+          fileStorage.filePath = "/dist/";
+          
+          document.onreadystatechange = function () {  
+            if (document.readyState == "complete") {
+              
+              var iframe = document.querySelector('iframe');
+                 
+              //-- Simple events
+              var evt = new CustomEvent("stored");
+              
+              //-- Test auto picking
+              var store = new fileStorage.storage();
+              
+              store.batch(["/tests/testpage.html", "/imgs/logo.png"], function() {
+                iframe.dispatchEvent(evt);
+              });
+              
+              iframe.addEventListener("stored", function() {
+                  
+                  store.get("/tests/testpage.html", function(url) {
+                    iframe.src = url;
+                  });
+                  
+              }, false);
+             
+              iframe.onload = function() {
+                  var srcs, resources;
+                  
+                  if(store.getStorageType() == "filesystem") return;
+                  
+                  srcs = iframe.contentDocument.querySelectorAll('[src]');
+                  resources = Array.prototype.slice.call(srcs);
+        
+                  resources.forEach(function(item){
+                    var src = item.getAttribute("src");
+        
+                    store.get(src, function(url){
+                      item.setAttribute("src", url);
+                    });
+                  
+                  });
+              }
+                               
+            }  
+          };
+        
+        </script>
+                
+        
         
 
         
@@ -31,5 +73,7 @@
         <div id="controls">
 
         </div>
+        <h1>fileStorage Test</h1>
+        <iframe width='800' height='300'></iframe>
     </body>
 </html>

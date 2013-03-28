@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 	  meta: {
 		banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
 		  '<%= grunt.template.today("yyyy-mm-dd") %> */' +
-		  'var fileStorage = {};'
+		  'var fileStorage = fileStorage || {};'
 	  },
 	  min: {
 		'dist/workers/loader_filesystem.js': ['<banner>', 'src/workers/loader_filesystem.js'],
