@@ -4,7 +4,7 @@ fileStorage.store.websql = function() {
 	var _blobs = {},
 		_queue = new fileStorage.Queue(loader, 6),
 		_db,
-		_URL = window.URL;
+		_URL = window.URL || window.webkitURL;
 
 	const DBNAME = "fileStoragejs_db";
 	const DBVERSION = "1";
@@ -15,7 +15,7 @@ fileStorage.store.websql = function() {
 	function loader(msg, postMessage){
 		var e = {"data":null},
 			path = msg;
-
+		
 		request(msg, function(file){
 				save(path, file);
 				postMessage(e);
@@ -67,7 +67,6 @@ fileStorage.store.websql = function() {
 		check(path, function(fromCache){
 
 			var url;
-
 			if(fromCache){
 				url = getURL(path, fromCache);
 				if(typeof(callback) != "undefined"){
@@ -83,13 +82,15 @@ fileStorage.store.websql = function() {
 			}
 
 		});
+		
 
 
 	}
 
 	function check(path, callback) {
 		var	request = {};
-		
+		console.log("path", path)
+
 		request.onError = function(event, err) {
 		  console.log("get Error", err);
 
@@ -98,7 +99,7 @@ fileStorage.store.websql = function() {
 		
 		request.onSuccess = function(transaction, result) {
 			var row;
-
+			
 			if(result.rows.length){
 				row = result.rows.item(0);
 				callback(row.file);
@@ -120,10 +121,11 @@ fileStorage.store.websql = function() {
 	}
 
 	function request(path, callback) {
-		var xhr = new fileStorage.core.loadFile(path);
+		var xhr = new fileStorage.core.loadFile(path, false, "arraybuffer");
 
 		xhr.succeeded = function(file) {
 			if(typeof(callback) != "undefined"){
+				//console.log(file)
 				callback(file);
 			}
 		}
@@ -137,13 +139,15 @@ fileStorage.store.websql = function() {
 		var	request = {},
 			reader = new FileReader(),
 			fileString;
+		 
+		if(!(file instanceof Blob)) {
+			console.log("Not blob")
+		}
 		
-		reader.readAsDataURL(file);
-			
 		reader.onload = function(event){
 			fileString = event.target.result;
+
 			opendb(function(db){
-				
 				db.transaction(function(tx){
 					tx.executeSql("REPLACE INTO "+TABLENAME+" (path, file, type) VALUES (?,?,?)",
 						[path, fileString, file.type],
@@ -154,13 +158,19 @@ fileStorage.store.websql = function() {
 			});
 		}
 		
+		reader.onerror = function(err) {
+			console.log("err", err)
+		}
+		
+		reader.readAsDataURL(file);
+		
 		request.onError = function(event, err) {
 		  console.log("failed: ", err);
 		};
 		
 		request.onSuccess = function(event) {
 		  //-- Do nothing for now
-		  //console.log("saved", path);
+		  console.log("saved", path);
 		};
 
 

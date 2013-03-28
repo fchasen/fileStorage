@@ -7,7 +7,7 @@
         <meta name="description" content="">
 
 
-        <!-- <link rel="stylesheet" href="css/main.css"> -->
+        <link rel="stylesheet" href="css/main.css">
         
         <!-- FileStorage min -->
         <script>
@@ -24,66 +24,125 @@
         <script src="src/storage.js"></script>
                 
         <script>
-            "use strict";
+          "use strict";
+                    
+          fileStorage.filePath = "src/";
+          
+          document.onreadystatechange = function () {  
+            if (document.readyState == "complete") {
+              testMethod("iframe-auto");
+              testMethod("iframe-filesystem", "filesystem");
+              testMethod("iframe-indexeddb", "indexeddb");
+              testMethod("iframe-websql", "websql");
+              testMethod("iframe-ram", "ram");
+              testMethod("iframe-none", "none");
+            } 
+          };
+          
+          //-- Test storage methods -- pass nothing to automatically test
+          function testMethod(el, method) {
+            var iframe = document.getElementById(el);
+            iframe.style.background = "red";
             
-            fileStorage.filePath = "/src/";
+            //-- Simple events
+            var evt = new CustomEvent("stored");
             
-            document.onreadystatechange = function () {  
-              if (document.readyState == "complete") {
+            //-- Test auto picking
+            var store = new fileStorage.storage(method);
+            
+            //-- Check that selected method was used
+            if(method && store.getStorageType() != method) {
+              //iframe.style.background = "green";
+              return;
+            }
+            
+            //-- Say what we selected
+            
+            if(!method) {
+              document.getElementById("selected").innerHTML = store.getStorageType();
+            }
+            
+            //-- Links must be absolute for workers
+            store.batch(["/tests/testpage.html", "/imgs/storage-closet.png"], function() {
+              iframe.dispatchEvent(evt);
+            });
+            
+            iframe.addEventListener("stored", function() {
                 
-                var iframe = document.querySelector('iframe');
-                   
-                //-- Simple events
-                var evt = new CustomEvent("stored");
-                
-                //-- Test auto picking
-                var store = new fileStorage.storage();
-                
-                store.batch(["/tests/testpage.html", "/imgs/logo.png"], function() {
-                  iframe.dispatchEvent(evt);
+                store.get("/tests/testpage.html", function(url) {
+                  iframe.src = url;
+                  //console.log(url)
                 });
                 
-                iframe.addEventListener("stored", function() {
-                    
-                    store.get("/tests/testpage.html", function(url) {
-                      iframe.src = url;
-                    });
-                    
-                }, false);
-               
-                iframe.onload = function() {
-                    var srcs, resources;
-                    
-                    if(store.getStorageType() == "filesystem") return;
-                    
-                    srcs = iframe.contentDocument.querySelectorAll('[src]');
-                    resources = Array.prototype.slice.call(srcs);
-
-                    resources.forEach(function(item){
-                      var src = item.getAttribute("src");
-
-                      store.get(src, function(url){
-                        item.setAttribute("src", url);
-                      });
-                    
-                    });
+            }, false);
+           
+            iframe.onload = function() {
+                var srcs, resources;
+                if(store.getStorageType() == "filesystem" || 
+                   store.getStorageType() == "none") {
+                  iframe.style.background = "green";
                 }
-                                 
-              }  
-            };
-        
-          </script>
+                
+                srcs = iframe.contentDocument.querySelectorAll('[src]');
+                resources = Array.prototype.slice.call(srcs);
+          
+                resources.forEach(function(item){
+                  var src = item.getAttribute("src");
+          
+                  store.get(src, function(url){
+                    item.setAttribute("src", url);
+                    iframe.style.background = "green";
+                  });
+                
+                });
+                
+                
+            }
+            
+                            
+          }
+        </script>
                 
         
         
-
+    
         
     </head>
     <body>
         <div id="controls">
-
+    
         </div>
         <h1>fileStorage Test</h1>
-        <iframe width='800' height='300'></iframe>
+        <p>Testing persistence of different methods</p>
+        
+        <div class="auto-test">
+          <h3>auto-selected: <em id="selected"></em></h3>
+          <iframe id="iframe-auto" src="tests/defaultpage.html"></iframe>
+        </div>
+        
+        <div class="test">
+          <h3>storage: <em>filesystem</em></h3>
+          <iframe id="iframe-filesystem" src="tests/defaultpage.html"></iframe>
+        </div>
+        
+        <div class="test">
+          <h3>storage: <em>indexeddb</em></h3>
+          <iframe id="iframe-indexeddb" src="tests/defaultpage.html"></iframe>
+        </div>
+        
+        <div class="test">
+          <h3>storage: <em>websql</em></h3>
+          <iframe id="iframe-websql" src="tests/defaultpage.html"></iframe>
+        </div>
+        
+        <div class="test">
+          <h3>storage: <em>ram</em></h3>
+          <iframe id="iframe-ram" src="tests/defaultpage.html"></iframe>
+        </div>
+        
+        <div class="test">
+          <h3>storage: <em>none</em></h3>
+          <iframe id="iframe-none" src="tests/defaultpage.html"></iframe>
+        </div>
     </body>
 </html>

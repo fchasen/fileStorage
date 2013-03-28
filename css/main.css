@@ -1,0 +1,13 @@
+.test {
+  float: left;
+  margin-right: 10px;
+}
+
+.auto-test{
+  clear: both;
+}
+
+iframe {
+  width: 230px;
+  height: 300px;
+}

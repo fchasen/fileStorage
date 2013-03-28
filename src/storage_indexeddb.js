@@ -8,7 +8,7 @@ fileStorage.store.indexeddb = function() {
 		_db,
 		_URL = window.URL;
 
-	const DBNAME = "fileStoragejs_db";
+	const DBNAME = "fileStorage_db";
 
 	//-- max of 6 concurrent requests: http://www.browserscope.org/?category=network
 	function loader(msg, postMessage){
@@ -114,13 +114,20 @@ fileStorage.store.indexeddb = function() {
 		opendb(function(db){
 			objectStore = db.transaction(["files"]).objectStore("files");
 			request = objectStore.get(path);
-
+			
 			request.onerror = function(event) {
+			  console.log("error:", event);
 			  callback(false);
 			};
 
 			request.onsuccess = function(event) {
-			  callback(request.result.file);
+			  var file = request.result.file;
+			  
+			  if(!file) {
+				  console.log("File not found", path);
+			  }else{
+				  callback(file);
+			  }
 			};
 		});
 
@@ -157,7 +164,7 @@ fileStorage.store.indexeddb = function() {
 
 			request.onsuccess = function(event) {
 			  //-- Do nothing for now
-			  // console.log("saved", path);
+			  //console.log("saved", path);
 			};
 		});
 	}

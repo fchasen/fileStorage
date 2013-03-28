@@ -1,6 +1,5 @@
 fileStorage.storage = function(override){
 
-
 	this._supported = {},
 	this._storageType = false;
 	this._store = false;

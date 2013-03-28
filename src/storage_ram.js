@@ -4,7 +4,7 @@ fileStorage.store.ram = function() {
 	var _store = {},
 		_blobs = {},
 		_queue = new fileStorage.Queue(loader, 6),
-		_URL = window.URL; 
+		_URL = window.URL || window.webkitURL; 
 		//-- max of 6 concurrent requests: http://www.browserscope.org/?category=network
 
 	

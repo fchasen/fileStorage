@@ -25,7 +25,7 @@ fileStorage.core.dataURLToBlob = function(dataURL) {
 	return new Blob([uInt8Array], {type: contentType});
  }
  
- fileStorage.core.loadFile = function(url, callback){
+ fileStorage.core.loadFile = function(url, callback, responseType){
  	var xhr = new XMLHttpRequest();
  
  	this.succeeded = function(response){
@@ -45,7 +45,7 @@ fileStorage.core.dataURLToBlob = function(dataURL) {
  		xhr.responseType = 'blob';
  
  		xhr.onload = function(e) {
- 			if (this.status == 200) {
+ 			if (this.status == 200) {		 			 
  				that.succeeded(this.response);
  			}
  		};

@@ -45,9 +45,9 @@ fileStorage.store.none = function() {
 			}
 		}else{
 			_queue.add(path, function(file){
-				url = getURL(path, file);
+				//url = getURL(path, file);
 				if(typeof(callback) != "undefined"){
-					callback(url);
+					callback(path);
 				}
 			}, true);
 		}
