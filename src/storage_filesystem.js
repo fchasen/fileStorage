@@ -2,7 +2,7 @@ fileStorage.store = fileStorage.store || {};
 
 fileStorage.store.filesystem = function() {
 	var _urls = {},
-		_queue = new fileStorage.Queue((fileStorage.filePath || '') + "workers/loader_filesystem.js", 6),
+		_queue = new fileStorage.Queue((fileStorage.filePath || '') + "loader_filesystem.js", 6),
 		_requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem,
 		_fs;
 
